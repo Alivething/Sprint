@@ -41,7 +41,7 @@ TEXT_PUSH = ["30 Pushups", "2 mins", "(N)EXT" , "(Q)UIT"]
 
 TEXT_SIT = ["30 Situps", "2 mins", "(N)EXT" , "(Q)UIT"]
 
-TEXT_JUMP = ["30 Jumping Jacks", "2 mins", "(N)EXT" , "(Q)UIT"]
+TEXT_JUMP = ["30 Starjumps", "2 mins", "(N)EXT" , "(Q)UIT"]
 
 WIDTH = 50
 HEIGHT = 60
@@ -69,7 +69,7 @@ class Snake:
     def __init__(self):
         """Initiate pyxel, set up initial game variables, and run."""
 
-        pyxel.init(WIDTH, HEIGHT, caption="Snake!", fps=10)
+        pyxel.init(WIDTH, HEIGHT, caption="Snake!", fps=40)
         define_sound_and_music()
         self.reset()
         pyxel.run(self.update, self.draw)
