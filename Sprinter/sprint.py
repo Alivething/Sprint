@@ -1,18 +1,3 @@
-"""Snake implemented with pyxel.
-
-This is the game of snake in pyxel version!
-
-Try and collect the tasty apples without running
-into the side or yourself.
-
-Controls are the arrow keys ← ↑ → ↓
-
-Q: Quit the game
-R: Restart the game
-
-Created by Marcus Croucher in 2018.
-"""
-
 from collections import deque, namedtuple
 from random import randint
 
