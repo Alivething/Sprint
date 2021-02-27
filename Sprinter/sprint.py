@@ -29,15 +29,19 @@ COL_BACKGROUND = 3
 COL_BODY = 11
 COL_HEAD = 7
 COL_DEATH = 8
-COL_APPLE = 8
+COL_APPLE1 = 8
+COL_APPLE2 = 9
+COL_APPLE3 = 10
 
 TEXT_DEATH = ["GAME OVER", "(Q)UIT", "(R)ESTART"]
 COL_TEXT_DEATH = 0
 HEIGHT_DEATH = 5
 
-TEXT_PUSH = ["30 Pushups", "2 mins", "(N)EXT"]
-COL_TEXT_PUSH = 0
-HEIGHT_PUSH = 5
+TEXT_PUSH = ["30 Pushups", "2 mins", "(N)EXT" , "(Q)UIT"]
+
+TEXT_SIT = ["30 Situps", "2 mins", "(N)EXT" , "(Q)UIT"]
+
+TEXT_JUMP = ["30 Jumping Jacks", "2 mins", "(N)EXT" , "(Q)UIT"]
 
 WIDTH = 50
 HEIGHT = 60
@@ -76,12 +80,25 @@ class Snake:
         self.direction = RIGHT
         self.snake = deque()
         self.snake.append(START)
-        self.death = False
+        self.death = 0
         self.score = 0
-        self.generate_apple()
+        self.generate_apple1()
+        self.generate_apple2()
+        self.generate_apple3()
 
         pyxel.playm(0, loop=True)
 
+    def resume(self):
+        self.direction = RIGHT
+        self.snake = deque()
+        self.snake.append(START)
+        self.death = 0
+        self.check_apple1()
+        self.check_apple2()
+        self.check_apple3()
+
+        pyxel.playm(0, loop=True)
+        
     ##############
     # Game logic #
     ##############
@@ -93,10 +110,15 @@ class Snake:
             self.update_direction()
             #self.update_snake()
             self.check_death()
-            self.check_apple()
+            self.check_apple1()
+            self.check_apple2()
+            self.check_apple3()
 
         if pyxel.btn(pyxel.KEY_Q):
             pyxel.quit()
+
+        if pyxel.btnp(pyxel.KEY_N):
+            self.resume()
 
         if pyxel.btnp(pyxel.KEY_R):
             self.reset()
@@ -126,25 +148,72 @@ class Snake:
         self.snake.appendleft(new_head)
         self.popped_point = self.snake.pop()
 
-    def check_apple(self):
+    def check_apple1(self):
         """Check whether the snake is on an apple."""
 
-        if self.snake[0] == self.apple:
+        if self.snake[0] == self.apple1:
             self.score += 1
+            self.death = 21
+            self.draw_push()
             #self.snake.append(self.popped_point)
-            self.generate_apple()
+            self.generate_apple1()
 
             pyxel.play(0, 0)
 
-    def generate_apple(self):
+    def check_apple2(self):
+        """Check whether the snake is on an apple."""
+
+        if self.snake[0] == self.apple2:
+            self.score += 1
+            self.death = 22
+            self.draw_sit()
+            #self.snake.append(self.popped_point)
+            self.generate_apple2()
+
+            pyxel.play(0, 0)
+
+    def check_apple3(self):
+        """Check whether the snake is on an apple."""
+
+        if self.snake[0] == self.apple3:
+            self.score += 1
+            self.death = 23
+            self.draw_jump()
+            #self.snake.append(self.popped_point)
+            self.generate_apple3()
+
+            pyxel.play(0, 0)
+
+    def generate_apple1(self):
         """Generate an apple randomly."""
         snake_pixels = set(self.snake)
 
-        self.apple = self.snake[0]
-        while self.apple in snake_pixels:
+        self.apple1 = self.snake[0]
+        while self.apple1 in snake_pixels:
             x = randint(0, WIDTH - 1)
             y = randint(HEIGHT_SCORE + 1, HEIGHT - 1)
-            self.apple = Point(x, y)
+            self.apple1 = Point(x, y)
+            
+
+    def generate_apple2(self):
+        """Generate an apple randomly."""
+        snake_pixels = set(self.snake)
+
+        self.apple2 = self.snake[0]
+        while self.apple2 in snake_pixels:
+            x = randint(0, WIDTH - 3)
+            y = randint(HEIGHT_SCORE + 3, HEIGHT - 3)
+            self.apple2 = Point(x, y)
+
+    def generate_apple3(self):
+        """Generate an apple randomly."""
+        snake_pixels = set(self.snake)
+
+        self.apple3 = self.snake[0]
+        while self.apple3 in snake_pixels:
+            x = randint(0, WIDTH - 5)
+            y = randint(HEIGHT_SCORE + 5, HEIGHT - 5)
+            self.apple3 = Point(x, y)
 
     def check_death(self):
         """Check whether the snake has died (out of bounds or doubled up.)"""
@@ -157,10 +226,10 @@ class Snake:
 
     def death_event(self):
         """Kill the game (bring up end screen)."""
-        self.death = True  # Check having run into self
-
+        self.death = 1  # Check having run into self
         pyxel.stop()
         pyxel.play(0, 1)
+        
 
     ##############
     # Draw logic #
@@ -169,14 +238,25 @@ class Snake:
     def draw(self):
         """Draw the background, snake, score, and apple OR the end screen."""
 
-        if not self.death:
+        if(self.death==0):
             pyxel.cls(col=COL_BACKGROUND)
             self.draw_snake()
             self.draw_score()
-            pyxel.pset(self.apple.x, self.apple.y, col=COL_APPLE)
+            pyxel.pset(self.apple1.x, self.apple1.y, col=COL_APPLE1)
+            pyxel.pset(self.apple2.x, self.apple2.y, col=COL_APPLE2)
+            pyxel.pset(self.apple3.x, self.apple3.y, col=COL_APPLE3)
 
-        else:
+        elif(self.death==1):
+            self.draw_death()
+
+        elif(self.death==21):
             self.draw_push()
+
+        elif(self.death==22):
+            self.draw_sit()
+
+        elif(self.death==23):
+            self.draw_jump()
 
     def draw_snake(self):
         """Draw the snake with a distinct head by iterating through deque."""
@@ -211,6 +291,28 @@ class Snake:
 
         pyxel.cls(col=COL_DEATH)
         display_text = TEXT_PUSH[:]
+        display_text.insert(1, "{:04}".format(self.score))
+        for i, text in enumerate(display_text):
+            y_offset = (pyxel.FONT_HEIGHT + 2) * i
+            text_x = self.center_text(text, WIDTH)
+            pyxel.text(text_x, HEIGHT_DEATH + y_offset, text, COL_TEXT_DEATH)
+
+    def draw_jump(self):
+        """Draw a blank screen with some text."""
+
+        pyxel.cls(col=COL_DEATH)
+        display_text = TEXT_JUMP[:]
+        display_text.insert(1, "{:04}".format(self.score))
+        for i, text in enumerate(display_text):
+            y_offset = (pyxel.FONT_HEIGHT + 2) * i
+            text_x = self.center_text(text, WIDTH)
+            pyxel.text(text_x, HEIGHT_DEATH + y_offset, text, COL_TEXT_DEATH)
+
+    def draw_sit(self):
+        """Draw a blank screen with some text."""
+
+        pyxel.cls(col=COL_DEATH)
+        display_text = TEXT_SIT[:]
         display_text.insert(1, "{:04}".format(self.score))
         for i, text in enumerate(display_text):
             y_offset = (pyxel.FONT_HEIGHT + 2) * i
