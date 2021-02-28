@@ -48,7 +48,7 @@ START = Point(5, 5 + HEIGHT_SCORE)
 ###################
 
 
-class Snake:
+class Sprint:
     """The class that sets up and runs the game."""
 
     def __init__(self):
@@ -60,11 +60,11 @@ class Snake:
         pyxel.run(self.update, self.draw)
 
     def reset(self):
-        """Initiate key variables (direction, snake, apple, score, etc.)"""
+        """Initiate key variables (direction, sprite, apple, score, etc.)"""
 
         self.direction = RIGHT
-        self.snake = deque()
-        self.snake.append(START)
+        self.sprite = deque()
+        self.sprite.append(START)
         self.death = 0
         self.score = 0
         self.generate_apple1()
@@ -75,8 +75,8 @@ class Snake:
 
     def resume(self):
         self.direction = RIGHT
-        self.snake = deque()
-        self.snake.append(START)
+        self.sprite = deque()
+        self.sprite.append(START)
         self.death = 0
         self.check_apple1()
         self.check_apple2()
@@ -89,11 +89,10 @@ class Snake:
     ##############
 
     def update(self):
-        """Update logic of game. Updates the snake and checks for scoring/win condition."""
+        """Update logic of game. Updates the sprite and checks for scoring/win condition."""
 
         if not self.death:
             self.update_direction()
-            #self.update_snake()
             self.check_death()
             self.check_apple1()
             self.check_apple2()
@@ -113,68 +112,67 @@ class Snake:
 
         if pyxel.btn(pyxel.KEY_UP):
             self.direction = UP
-            self.update_snake()
+            self.update_sprite()
         elif pyxel.btn(pyxel.KEY_DOWN):
             self.direction = DOWN
-            self.update_snake()
+            self.update_sprite()
         elif pyxel.btn(pyxel.KEY_LEFT):
             self.direction = LEFT
-            self.update_snake()
+            self.update_sprite()
         elif pyxel.btn(pyxel.KEY_RIGHT):
             self.direction = RIGHT
-            self.update_snake()
+            self.update_sprite()
             
 
-    def update_snake(self):
-        """Move the snake based on the direction."""
+    def update_sprite(self):
+        """Move the sprite based on the direction."""
 
-        old_head = self.snake[0]
+        old_head = self.sprite[0]
         new_head = Point(old_head.x + self.direction.x, old_head.y + self.direction.y)
-        self.snake.appendleft(new_head)
-        self.popped_point = self.snake.pop()
+        self.sprite.appendleft(new_head)
+        self.popped_point = self.sprite.pop()
 
     def check_apple1(self):
-        """Check whether the snake is on an apple."""
+        """Check whether the sprite is on an apple."""
 
-        if self.snake[0] == self.apple1:
+        if self.sprite[0] == self.apple1:
             self.score += 1
             self.death = 21
             self.draw_push()
-            #self.snake.append(self.popped_point)
             self.generate_apple1()
 
             pyxel.play(0, 0)
 
     def check_apple2(self):
-        """Check whether the snake is on an apple."""
+        """Check whether the sprite is on an apple."""
 
-        if self.snake[0] == self.apple2:
+        if self.sprite[0] == self.apple2:
             self.score += 1
             self.death = 22
             self.draw_sit()
-            #self.snake.append(self.popped_point)
+           
             self.generate_apple2()
 
             pyxel.play(0, 0)
 
     def check_apple3(self):
-        """Check whether the snake is on an apple."""
+        """Check whether the sprite is on an apple."""
 
-        if self.snake[0] == self.apple3:
+        if self.sprite[0] == self.apple3:
             self.score += 1
             self.death = 23
             self.draw_jump()
-            #self.snake.append(self.popped_point)
+            #self.sprite.append(self.popped_point)
             self.generate_apple3()
 
             pyxel.play(0, 0)
 
     def generate_apple1(self):
         """Generate an apple randomly."""
-        snake_pixels = set(self.snake)
+        sprite_pixels = set(self.sprite)
 
-        self.apple1 = self.snake[0]
-        while self.apple1 in snake_pixels:
+        self.apple1 = self.sprite[0]
+        while self.apple1 in sprite_pixels:
             x = randint(0, WIDTH - 1)
             y = randint(HEIGHT_SCORE + 1, HEIGHT - 1)
             self.apple1 = Point(x, y)
@@ -182,31 +180,31 @@ class Snake:
 
     def generate_apple2(self):
         """Generate an apple randomly."""
-        snake_pixels = set(self.snake)
+        sprite_pixels = set(self.sprite)
 
-        self.apple2 = self.snake[0]
-        while self.apple2 in snake_pixels:
+        self.apple2 = self.sprite[0]
+        while self.apple2 in sprite_pixels:
             x = randint(0, WIDTH - 3)
             y = randint(HEIGHT_SCORE + 3, HEIGHT - 3)
             self.apple2 = Point(x, y)
 
     def generate_apple3(self):
         """Generate an apple randomly."""
-        snake_pixels = set(self.snake)
+        sprite_pixels = set(self.sprite)
 
-        self.apple3 = self.snake[0]
-        while self.apple3 in snake_pixels:
+        self.apple3 = self.sprite[0]
+        while self.apple3 in sprite_pixels:
             x = randint(0, WIDTH - 5)
             y = randint(HEIGHT_SCORE + 5, HEIGHT - 5)
             self.apple3 = Point(x, y)
 
     def check_death(self):
-        """Check whether the snake has died (out of bounds or doubled up.)"""
+        """Check whether the sprite has died (out of bounds or doubled up.)"""
 
-        head = self.snake[0]
+        head = self.sprite[0]
         if head.x < 0 or head.y <= HEIGHT_SCORE or head.x >= WIDTH or head.y >= HEIGHT:
             self.death_event()
-        elif len(self.snake) != len(set(self.snake)):
+        elif len(self.sprite) != len(set(self.sprite)):
             self.death_event()
 
     def death_event(self):
@@ -221,12 +219,12 @@ class Snake:
     ##############
 
     def draw(self):
-        """Draw the background, snake, score, and apple OR the end screen."""
+        """Draw the background, sprite, score, and apple OR the end screen."""
 
         if(self.death==0):
             pyxel.cls(col=COL_BACKGROUND)
             pyxel.rectb(0,6,WIDTH,HEIGHT-6,0)
-            self.draw_snake()
+            self.draw_sprite()
             self.draw_score()
             pyxel.pset(self.apple1.x, self.apple1.y, col=COL_APPLE1)
             pyxel.pset(self.apple2.x, self.apple2.y, col=COL_APPLE2)
@@ -244,9 +242,9 @@ class Snake:
         elif(self.death==23):
             self.draw_jump()
 
-    def draw_snake(self):
-        """Draw the snake with a distinct head by iterating through deque."""
-        for i, point in enumerate(self.snake):
+    def draw_sprite(self):
+        """Draw the sprite with a distinct head by iterating through deque."""
+        for i, point in enumerate(self.sprite):
             if i == 0:
                 colour = COL_HEAD
             else:
@@ -386,4 +384,4 @@ def define_sound_and_music():
     pyxel.music(0).set([], [2], [3], [4])
 
 
-Snake()
+Sprint()
