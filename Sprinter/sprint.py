@@ -225,6 +225,7 @@ class Snake:
 
         if(self.death==0):
             pyxel.cls(col=COL_BACKGROUND)
+            pyxel.rectb(0,6,WIDTH,HEIGHT-6,0)
             self.draw_snake()
             self.draw_score()
             pyxel.pset(self.apple1.x, self.apple1.y, col=COL_APPLE1)
@@ -245,13 +246,12 @@ class Snake:
 
     def draw_snake(self):
         """Draw the snake with a distinct head by iterating through deque."""
-
         for i, point in enumerate(self.snake):
             if i == 0:
                 colour = COL_HEAD
             else:
                 colour = COL_BODY
-            pyxel.pset(point.x, point.y, col=colour)
+        pyxel.pset(point.x, point.y, col=colour)
 
     def draw_score(self):
         """Draw the score at the top."""
